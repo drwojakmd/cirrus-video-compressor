@@ -67,7 +67,7 @@ nav { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-
   color: #fff; isolation: isolate; transform: translateZ(0) }
 /* the solid bar is its own layer that only fades: no height change, no re-blurring mid-transition */
 nav::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0; transition: opacity .3s ease;
-  background: rgba(10, 22, 44, .86); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  background: rgba(11, 24, 47, .95);
   box-shadow: 0 1px 0 rgba(255,255,255,.07); will-change: opacity }
 nav.solid::before { opacity: 1 }
 .brand { display: flex; align-items: center; gap: 10px; font: 400 21px/1 var(--display); letter-spacing: .02em; color: #fff; text-decoration: none }
@@ -109,7 +109,7 @@ h1 .second { font-weight: 300; color: rgba(255,255,255,.93) }
 .d1 { animation-delay: 1.15s } .d2 { animation-delay: 1.3s } .d3 { animation-delay: 1.5s } .d4 { animation-delay: 1.7s } .d5 { animation-delay: 1.85s }
 @keyframes rise { to { opacity: 1; transform: none } }
 .sizecard { position: absolute; right: 0; bottom: 9vh; width: 300px; padding: 18px 20px; border-radius: 18px;
-  background: rgba(255,255,255,.1); backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); transform: translateZ(0);
+  background: rgba(28, 50, 88, .72); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16);
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 20px 50px rgba(5, 15, 35, .25); font-variant-numeric: tabular-nums }
 .sizecard .file { font-size: 13px; color: rgba(255,255,255,.75); display: flex; justify-content: space-between; gap: 10px }
 .sizecard .big { font: 300 40px/1.1 var(--display); letter-spacing: -.02em; margin-top: 8px }
@@ -136,7 +136,7 @@ h1 .second { font-weight: 300; color: rgba(255,255,255,.93) }
 
 /* before / after */
 .compare { margin-top: 56px; display: grid; gap: 18px }
-.ba { position: relative; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #000; cursor: ew-resize; user-select: none; touch-action: pan-y;
+.ba { position: relative; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #F4F4F0; cursor: ew-resize; user-select: none; touch-action: pan-y;
   box-shadow: 0 30px 80px rgba(10, 25, 50, .18), 0 0 0 1px var(--line); max-width: 100% }
 .ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: auto }
 .ba.pixel img { image-rendering: pixelated }
@@ -144,7 +144,7 @@ h1 .second { font-weight: 300; color: rgba(255,255,255,.93) }
 .ba .handle { position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; background: #fff; transform: translateX(-1px); box-shadow: 0 0 12px rgba(0,0,0,.3) }
 .ba .handle::after { content: ""; position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, -50%);
   background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E1F3D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l-5 6 5 6M15 6l5 6-5 6'/%3E%3C/svg%3E") center / 20px no-repeat; box-shadow: 0 4px 16px rgba(0,0,0,.25) }
-.ba .lab { position: absolute; top: 14px; font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 99px; background: rgba(6, 14, 30, .62); color: #fff; backdrop-filter: blur(8px) }
+.ba .lab { position: absolute; top: 14px; font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 99px; background: rgba(6, 14, 30, .78); color: #fff }
 .ba .lab.l { left: 14px } .ba .lab.r { right: 14px }
 .ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0 }
 .ba-bar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--muted) }
@@ -189,9 +189,9 @@ h1 .second { font-weight: 300; color: rgba(255,255,255,.93) }
 .window .bar { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #162135; border-bottom: 1px solid #22304A }
 .window .bar i { width: 11px; height: 11px; border-radius: 50% } .window .bar i:nth-child(1) { background: #FF5F57 } .window .bar i:nth-child(2) { background: #FEBC2E } .window .bar i:nth-child(3) { background: #28C840 }
 .window .bar span { margin: 0 auto; font-weight: 600; font-size: 12.5px; color: #8796AD }
-.window .stage { position: relative; aspect-ratio: 16 / 8.4; background: #000 }
+.window .stage { position: relative; aspect-ratio: 16 / 8.4; background: #F4F4F0 }
 .window .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .5s }
-.window .tabs { position: absolute; top: 12px; left: 12px; display: flex; gap: 4px; padding: 3px; border-radius: 9px; background: rgba(0,0,0,.55); backdrop-filter: blur(8px) }
+.window .tabs { position: absolute; top: 12px; left: 12px; display: flex; gap: 4px; padding: 3px; border-radius: 9px; background: rgba(0,0,0,.72) }
 .window .tabs span { padding: 5px 10px; border-radius: 7px; font-size: 11.5px; color: rgba(255,255,255,.75) }
 .window .tabs span.on { background: rgba(255,255,255,.18); color: #fff }
 .window .opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px }
@@ -228,7 +228,7 @@ td.n { font-variant-numeric: tabular-nums; white-space: nowrap }
 .dl .req { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px }
 .dl .req span { font-size: 13px; padding: 7px 13px; border-radius: 99px; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); color: rgba(255,255,255,.88) }
 .first { margin: 64px auto 0; max-width: 880px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; text-align: left }
-.first div { padding: 22px; border-radius: 18px; background: rgba(8, 20, 42, .32); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 14.5px; color: rgba(255,255,255,.86) }
+.first div { padding: 22px; border-radius: 18px; background: rgba(14, 30, 58, .72); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); font-size: 14.5px; color: rgba(255,255,255,.86) }
 .first b { display: block; font: 500 12px var(--mono); color: var(--dawn); margin-bottom: 8px; letter-spacing: .04em }
 
 /* faq */
@@ -426,6 +426,7 @@ footer .legal { margin-top: 24px; font-size: 12.5px; max-width: 62em }
       <div class="bar"><i></i><i></i><i></i><span>Preview Studio</span></div>
       <div class="stage">
         <img id="studioImg" src="assets/lecture-detail-original.png" alt="Detail of a lecture slide as shown in Preview Studio" width="1280" height="720" loading="lazy">
+        <img id="studioImg2" src="assets/lecture-detail-cirrus.png" alt="" aria-hidden="true" width="1280" height="720" loading="lazy" style="opacity:0">
         <div class="tabs" id="studioTabs"><span class="on">Original</span><span>A · Your settings</span><span>B · Smaller</span></div>
       </div>
       <div class="opts">
@@ -693,8 +694,11 @@ const CIRRUS = { repo: "drwojakmd/cirrus-video-compressor", version: "1.1.0", as
   document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
     const [bf, af] = views[b.dataset.view];
-    ba.querySelector('[data-before]').src = bf; ba.querySelector('[data-after]').src = af;
-    ba.classList.toggle('pixel', b.dataset.view === 'detail');
+    const ready = [bf, af].map(u => { const i = new Image(); i.src = u; return i.decode().catch(() => {}); });
+    Promise.all(ready).then(() => {
+      ba.querySelector('[data-before]').src = bf; ba.querySelector('[data-after]').src = af;
+      ba.classList.toggle('pixel', b.dataset.view === 'detail');
+    });
   }));
   if (!reduce) {     // a one-time hint that the divider moves
     const once = new IntersectionObserver(es => { if (!es[0].isIntersecting) return; once.disconnect();
@@ -710,7 +714,7 @@ const CIRRUS = { repo: "drwojakmd/cirrus-video-compressor", version: "1.1.0", as
   let si = 0;
   if (!reduce) setInterval(() => {
     si = (si + 1) % 2;
-    sImg.src = si ? 'assets/lecture-detail-cirrus.png' : 'assets/lecture-detail-original.png';
+    document.getElementById('studioImg2').style.opacity = si ? 1 : 0;
     tabs.forEach((t, i) => t.classList.toggle('on', i === si));
   }, 2600);
 })();
