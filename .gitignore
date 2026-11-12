@@ -1,0 +1,19 @@
+# Build products (the app is attached to GitHub Releases, not committed)
+build/
+.build/
+*.dmg
+
+# Large media: regenerate with Benchmarks/make_clips.py, make_text_clips.py and Tests/integration/make_inputs.sh
+Benchmarks/clips/
+Benchmarks/previews/
+Tests/integration/inputs/
+Tests/integration/__pycache__/
+Benchmarks/__pycache__/
+Benchmarks/results/run.log
+
+# Website preview copy (the site itself is Website/index.html)
+Website/preview.html
+Website/hero-preview.html
+
+.DS_Store
+*.swp

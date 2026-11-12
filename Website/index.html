@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cirrus Video Compressor</title>
+<meta name="description" content="Cirrus measures your video and finds the smallest file that still looks like the original, with the text on your slides still sharp enough to read. Free for macOS.">
+<meta property="og:title" content="Cirrus Video Compressor: less weight, same picture">
+<meta property="og:description" content="The smallest file that still looks like the original. Free for macOS.">
+<meta property="og:image" content="assets/icon-1024.png">
+<meta name="theme-color" content="#0E1F3D">
+<link rel="icon" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/icon-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sky hero → measured proof with a before/after → how it works (a single convergence thread) → features →
+   Preview Studio → formats → download (sky again) → FAQ → footer. One reading column, 1240 max. */
+:root {
+  --altitude: #0E1F3D;
+  --sky: #4D7DB8;
+  --haze: #BFD3EA;
+  --dawn: #F2C2A0;
+  --dawn-deep: #C9774A;
+  --bg: #F7F9FC;
+  --bg-2: #EEF2F8;
+  --fg: #0E1726;
+  --muted: #5A6A80;
+  --line: #DCE3EC;
+  --card: #FFFFFF;
+  --accent: #3A6AAE;
+  --good: #2F7D5B;
+  --display: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Instrument Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #070C16; --bg-2: #0B1220; --fg: #E6ECF5; --muted: #8B99AE; --line: #1A2638; --card: #0E1625; --accent: #8FB6E8; --good: #6FC79E; --dawn-deep: #F0B28C;
+  color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #070C16; --bg-2: #0B1220; --fg: #E6ECF5; --muted: #8B99AE; --line: #1A2638; --card: #0E1625; --accent: #8FB6E8; --good: #6FC79E; --dawn-deep: #F0B28C; color-scheme: dark }
+
+* { box-sizing: border-box }
+html { scroll-behavior: smooth; scroll-padding-top: 72px }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 var(--body); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 20; background: var(--altitude) }
+img { max-width: 100%; display: block }
+a { color: inherit }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0 }
+h2 { font-weight: 300; font-size: clamp(34px, 4.8vw, 62px); line-height: 1.04; letter-spacing: -.028em }
+h3 { font-weight: 500; font-size: 21px; letter-spacing: -.01em; line-height: 1.25 }
+p { margin: 0 }
+.eyebrow { font: 500 12px/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); display: flex; gap: 14px; align-items: center }
+.eyebrow i { display: inline-block; width: 28px; height: 1px; background: currentColor; opacity: .5 }
+.lead { font-size: clamp(17px, 1.5vw, 20px); color: var(--muted); max-width: 38em; margin-top: 22px }
+section { padding-block: clamp(90px, 12vw, 160px) }
+.num { font-variant-numeric: tabular-nums }
+
+/* entrance on scroll (content is visible without it: only a gentle rise) */
+.rise { transition: opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1) }
+.js .rise:not(.in) { opacity: .001; transform: translateY(22px) }
+
+/* nav */
+nav { position: fixed; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 15; display: flex; align-items: center; gap: 28px;
+  padding-block: 18px; padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px));
+  color: #fff; transition: background .4s, padding .4s, box-shadow .4s }
+nav.solid { background: rgba(10, 22, 44, .62); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); padding-block: 11px; box-shadow: 0 1px 0 rgba(255,255,255,.06) }
+.brand { display: flex; align-items: center; gap: 10px; font: 400 21px/1 var(--display); letter-spacing: .02em; color: #fff; text-decoration: none }
+.brand img { width: 30px; height: 30px }
+nav .links { display: flex; gap: 26px; margin-left: auto; font-size: 14px }
+nav .links a { color: rgba(255,255,255,.76); text-decoration: none; transition: color .2s }
+nav .links a:hover { color: #fff }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 10px; border-radius: 999px; font: 600 15px/1 var(--body); text-decoration: none; cursor: pointer; border: 0;
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s, background .3s }
+.btn:focus-visible { outline: 2px solid var(--dawn); outline-offset: 3px }
+.btn-light { background: #fff; color: var(--altitude); padding: 17px 27px; box-shadow: 0 10px 30px rgba(8, 20, 45, .28) }
+.btn-light:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(8, 20, 45, .35), 0 0 0 6px rgba(242, 194, 160, .2) }
+.btn-ghost { color: #fff; padding: 17px 22px; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.24) }
+.btn-ghost:hover { background: rgba(255,255,255,.15) }
+.btn-small { padding: 10px 16px; font-size: 13.5px }
+.btn svg { width: 16px; height: 16px; flex: none }
+
+/* sky (hero + download) */
+.sky { position: relative; overflow: hidden; color: #fff; isolation: isolate;
+  background: linear-gradient(180deg, #0A1830 0%, #14294D 24%, #2E5590 52%, #6F98C8 74%, #C9D9EC 90%, #F2C2A0 100%) }
+.sky::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(120% 70% at 80% 100%, rgba(242,194,160,.28), transparent 60%), radial-gradient(80% 50% at 10% 0%, rgba(255,255,255,.06), transparent 70%) }
+.sky canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1 }
+.hero { min-height: max(660px, 94svh) }
+.hero-inner { position: relative; min-height: inherit; display: grid; align-content: end; padding-block: 150px 9vh }
+h1 { font-weight: 200; font-size: clamp(54px, 9.4vw, 136px); line-height: .94; letter-spacing: -.036em; margin-top: 22px }
+h1 span { display: block }
+h1 .second { font-weight: 300; color: rgba(255,255,255,.93) }
+.hero .eyebrow, .dl .eyebrow { color: rgba(255,255,255,.72) }
+.hero .lead, .dl .lead { color: rgba(255,255,255,.84) }
+.ctas { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 36px }
+.meta { margin-top: 22px; font-size: 13px; color: rgba(255,255,255,.64) }
+.reveal { opacity: 0; transform: translateY(18px); animation: rise 1.1s cubic-bezier(.2,.8,.2,1) forwards }
+.d1 { animation-delay: 1.15s } .d2 { animation-delay: 1.3s } .d3 { animation-delay: 1.5s } .d4 { animation-delay: 1.7s } .d5 { animation-delay: 1.85s }
+@keyframes rise { to { opacity: 1; transform: none } }
+.sizecard { position: absolute; right: 0; bottom: 9vh; width: 300px; padding: 18px 20px; border-radius: 18px;
+  background: rgba(255,255,255,.1); backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 20px 50px rgba(5, 15, 35, .25); font-variant-numeric: tabular-nums }
+.sizecard .file { font-size: 13px; color: rgba(255,255,255,.75); display: flex; justify-content: space-between; gap: 10px }
+.sizecard .big { font: 300 40px/1.1 var(--display); letter-spacing: -.02em; margin-top: 8px }
+.sizecard .bar { height: 3px; border-radius: 3px; background: rgba(255,255,255,.18); margin-top: 14px; overflow: hidden }
+.sizecard .bar b { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #fff, var(--dawn)); transform-origin: left }
+.sizecard .foot { display: flex; justify-content: space-between; margin-top: 10px; font-size: 12.5px; color: rgba(255,255,255,.72) }
+.sizecard .foot b { color: var(--dawn); font-weight: 600 }
+
+/* proof */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin-top: 64px; background: var(--line); border-radius: 22px; overflow: hidden; border: 1px solid var(--line) }
+.stat { background: var(--card); padding: 34px 30px 30px; min-width: 0 }
+.stat .k { font-size: 13px; color: var(--muted) }
+.stat .v { font: 300 clamp(36px, 3.6vw, 48px)/1.05 var(--display); letter-spacing: -.02em; margin-top: 14px; font-variant-numeric: tabular-nums }
+.stat .v small { font-size: .45em; color: var(--muted); letter-spacing: 0; vertical-align: middle }
+.stat p { color: var(--muted); font-size: 15px; margin-top: 14px }
+.bars { display: grid; gap: 6px; margin-top: 18px }
+.bars i { display: block; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--muted) 28%, transparent) }
+.bars i.b { background: linear-gradient(90deg, var(--accent), var(--dawn-deep)) }
+.dots { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; margin-top: 18px; font-size: 12px; color: var(--muted) }
+.dots b { display: grid; grid-template-columns: repeat(25, 1fr); gap: 3px }
+.dots b i { aspect-ratio: 1; border-radius: 50%; background: color-mix(in srgb, var(--good) 55%, transparent) }
+.dots b i.x { background: var(--dawn-deep) }
+.tag { display: inline-block; margin-top: 16px; font-size: 12px; padding: 5px 10px; border-radius: 99px; background: color-mix(in srgb, var(--dawn-deep) 14%, transparent); color: var(--dawn-deep); font-weight: 500 }
+
+/* before / after */
+.compare { margin-top: 56px; display: grid; gap: 18px }
+.ba { position: relative; aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #000; cursor: ew-resize; user-select: none; touch-action: pan-y;
+  box-shadow: 0 30px 80px rgba(10, 25, 50, .18), 0 0 0 1px var(--line); max-width: 100% }
+.ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: auto }
+.ba.pixel img { image-rendering: pixelated }
+.ba .after { clip-path: inset(0 0 0 var(--split, 50%)) }
+.ba .handle { position: absolute; top: 0; bottom: 0; left: var(--split, 50%); width: 2px; background: #fff; transform: translateX(-1px); box-shadow: 0 0 12px rgba(0,0,0,.3) }
+.ba .handle::after { content: ""; position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; border-radius: 50%; transform: translate(-50%, -50%);
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E1F3D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l-5 6 5 6M15 6l5 6-5 6'/%3E%3C/svg%3E") center / 20px no-repeat; box-shadow: 0 4px 16px rgba(0,0,0,.25) }
+.ba .lab { position: absolute; top: 14px; font-size: 12.5px; font-weight: 600; padding: 6px 11px; border-radius: 99px; background: rgba(6, 14, 30, .62); color: #fff; backdrop-filter: blur(8px) }
+.ba .lab.l { left: 14px } .ba .lab.r { right: 14px }
+.ba input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0 }
+.ba-bar { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; justify-content: space-between; font-size: 14px; color: var(--muted) }
+.seg { display: inline-flex; padding: 3px; border-radius: 99px; background: var(--bg-2); border: 1px solid var(--line) }
+.seg button { border: 0; background: transparent; color: var(--muted); font: 500 13.5px/1 var(--body); padding: 9px 15px; border-radius: 99px; cursor: pointer }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,.12) }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 22px }
+.facts b { color: var(--fg); font-weight: 600 }
+
+/* how it works */
+.steps { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px; margin-top: 72px }
+.thread { position: absolute; left: 0; right: 0; top: 34px; height: 70px; pointer-events: none; overflow: visible }
+.thread path { fill: none; stroke: var(--accent); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 1400; stroke-dashoffset: 1400; transition: stroke-dashoffset 2.4s cubic-bezier(.4,0,.2,1); opacity: .45 }
+.steps.in .thread path { stroke-dashoffset: 0 }
+.step { position: relative; min-width: 0 }
+.step .dot { width: 68px; height: 68px; border-radius: 20px; display: grid; place-items: center; background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 10px 30px rgba(20, 40, 80, .07); position: relative; z-index: 1 }
+.step .dot svg { width: 34px; height: 34px; color: var(--accent) }
+.step:last-child .dot { background: radial-gradient(circle at 50% 50%, #fff 0 18%, var(--dawn) 19% 34%, transparent 35%), var(--card) }
+.step h3 { margin-top: 24px; font-size: 19px }
+.step p { color: var(--muted); font-size: 15px; margin-top: 8px }
+.step .n { font: 500 12px var(--mono); color: var(--muted); margin-top: 20px; display: block }
+
+/* features */
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 64px }
+.feature { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 30px; display: grid; gap: 14px; align-content: start; min-width: 0;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s }
+.feature:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(20, 40, 80, .1) }
+.feature .art { height: 120px; border-radius: 14px; overflow: hidden; background: linear-gradient(160deg, #13284B, #3E6AA5 70%, #9DBAE0); position: relative }
+.feature .art svg { position: absolute; inset: 0; width: 100%; height: 100% }
+.feature p { color: var(--muted); font-size: 15.5px }
+.feature .fine { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; margin-top: 4px }
+.feature .fine b { color: var(--fg); font-weight: 600 }
+
+/* studio window */
+.studio { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; align-items: center; margin-top: 10px }
+.window { border-radius: 14px; overflow: hidden; background: #111A2A; color: #E4EBF5; box-shadow: 0 40px 100px rgba(10, 25, 50, .3), 0 0 0 1px rgba(255,255,255,.06); font: 13px/1.4 -apple-system, var(--body) }
+.window .bar { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #162135; border-bottom: 1px solid #22304A }
+.window .bar i { width: 11px; height: 11px; border-radius: 50% } .window .bar i:nth-child(1) { background: #FF5F57 } .window .bar i:nth-child(2) { background: #FEBC2E } .window .bar i:nth-child(3) { background: #28C840 }
+.window .bar span { margin: 0 auto; font-weight: 600; font-size: 12.5px; color: #8796AD }
+.window .stage { position: relative; aspect-ratio: 16 / 8.4; background: #000 }
+.window .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .5s }
+.window .tabs { position: absolute; top: 12px; left: 12px; display: flex; gap: 4px; padding: 3px; border-radius: 9px; background: rgba(0,0,0,.55); backdrop-filter: blur(8px) }
+.window .tabs span { padding: 5px 10px; border-radius: 7px; font-size: 11.5px; color: rgba(255,255,255,.75) }
+.window .tabs span.on { background: rgba(255,255,255,.18); color: #fff }
+.window .opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px }
+.opt { border-radius: 10px; padding: 11px 12px; background: #172238; border: 1px solid #22304A; min-width: 0 }
+.opt.on { border-color: #8FB6E8; box-shadow: 0 0 0 1px #8FB6E8 }
+.opt .h { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 12.5px }
+.opt .h b { width: 18px; height: 18px; border-radius: 50%; background: #8FB6E8; color: #0F1625; display: grid; place-items: center; font-size: 11px }
+.opt dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 8px; margin: 9px 0 0; font-size: 11.5px }
+.opt dt { color: #8796AD } .opt dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums }
+.opt dd.good { color: #6FC79E } .opt dd.warn { color: #F0B28C }
+.bullets { display: grid; gap: 18px; margin-top: 30px }
+.bullets div { display: grid; grid-template-columns: 26px 1fr; gap: 12px; color: var(--muted); font-size: 15.5px }
+.bullets svg { width: 22px; height: 22px; color: var(--accent); margin-top: 2px }
+.bullets b { color: var(--fg); font-weight: 600 }
+
+/* formats */
+.tablewrap { overflow-x: auto; margin-top: 56px; border-radius: 20px; border: 1px solid var(--line); background: var(--card) }
+table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 720px }
+th, td { text-align: left; padding: 18px 22px; border-bottom: 1px solid var(--line); vertical-align: top }
+tr:last-child td { border-bottom: 0 }
+th { font: 500 12px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted) }
+td .sub { display: block; color: var(--muted); font-size: 13px; margin-top: 3px }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 99px; white-space: nowrap }
+.pill.y { background: color-mix(in srgb, var(--good) 13%, transparent); color: var(--good) }
+.pill.n { background: color-mix(in srgb, var(--dawn-deep) 13%, transparent); color: var(--dawn-deep) }
+.src { margin-top: 18px; font-size: 13px; color: var(--muted) }
+
+/* download */
+.dl { padding-block: clamp(110px, 14vw, 180px); text-align: center }
+.dl h2 { color: #fff; font-size: clamp(42px, 6.4vw, 88px); font-weight: 200 }
+.dl .lead { margin-left: auto; margin-right: auto }
+.dl .ctas { justify-content: center }
+.dl .req { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px }
+.dl .req span { font-size: 13px; padding: 7px 13px; border-radius: 99px; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,.18); color: rgba(255,255,255,.88) }
+.first { margin: 64px auto 0; max-width: 880px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; text-align: left }
+.first div { padding: 22px; border-radius: 18px; background: rgba(8, 20, 42, .32); box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-size: 14.5px; color: rgba(255,255,255,.86) }
+.first b { display: block; font: 500 12px var(--mono); color: var(--dawn); margin-bottom: 8px; letter-spacing: .04em }
+
+/* faq */
+.faq { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 64px; align-items: start }
+details { border-bottom: 1px solid var(--line) }
+summary { list-style: none; cursor: pointer; padding: 22px 40px 22px 0; font: 500 19px/1.35 var(--display); position: relative }
+summary::-webkit-details-marker { display: none }
+summary::after { content: ""; position: absolute; right: 6px; top: 50%; width: 12px; height: 12px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: translateY(-70%) rotate(45deg); transition: transform .3s }
+details[open] summary::after { transform: translateY(-30%) rotate(225deg) }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px }
+details p { color: var(--muted); padding-bottom: 24px; max-width: 46em }
+
+/* footer */
+footer { border-top: 1px solid var(--line); padding-block: 48px 64px; font-size: 14px; color: var(--muted) }
+footer .row { display: flex; flex-wrap: wrap; gap: 18px 36px; align-items: center; justify-content: space-between }
+footer .brand { color: var(--fg) }
+footer nav { position: static; padding: 0; color: inherit; display: flex; gap: 22px; flex-wrap: wrap; background: none }
+footer a { text-decoration: none } footer a:hover { color: var(--fg) }
+footer .legal { margin-top: 24px; font-size: 12.5px; max-width: 62em }
+
+@media (max-width: 1000px) {
+  .steps { grid-template-columns: 1fr 1fr; } .thread { display: none }
+  .features { grid-template-columns: 1fr 1fr }
+  .studio { grid-template-columns: 1fr; gap: 40px }
+  .faq { grid-template-columns: 1fr; gap: 24px }
+}
+@media (max-width: 760px) {
+  nav .links { display: none }
+  .sizecard { position: relative; right: auto; bottom: auto; margin-top: 40px; width: 100% }
+  .hero-inner { padding-bottom: 56px }
+  .stats, .features, .first { grid-template-columns: 1fr }
+  .steps { grid-template-columns: 1fr }
+  .window .opts { grid-template-columns: 1fr }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { animation: none; opacity: 1; transform: none }
+  .js .rise:not(.in) { opacity: 1; transform: none }
+  .thread path { transition: none; stroke-dashoffset: 0 }
+  html { scroll-behavior: auto }
+}
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js')</script>
+
+<nav id="nav">
+  <a class="brand" href="#top" aria-label="Cirrus, back to top"><img src="assets/icon-256.png" alt="">Cirrus</a>
+  <div class="links"><a href="#results">Results</a><a href="#how">How it works</a><a href="#features">Features</a><a href="#formats">Formats</a><a href="#faq">FAQ</a></div>
+  <a class="btn btn-light btn-small" href="#download" data-pull>Download</a>
+</nav>
+
+<header class="sky hero" id="top">
+  <canvas id="sky-hero" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <div class="eyebrow reveal d1"><i></i>Video compressor for macOS · Free</div>
+    <h1><span class="reveal d2">Less weight.</span><span class="second reveal d3">Same picture.</span></h1>
+    <p class="lead reveal d4">Cirrus measures your video and finds the smallest file that still looks like the original, with the text on your slides still sharp enough to read.</p>
+    <div class="ctas reveal d5">
+      <a class="btn btn-light" href="#download" data-download data-pull><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v9m0 0L4.2 6.8M8 10.5l3.8-3.7M2.5 14h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+      <a class="btn btn-ghost" href="#results">See the results</a>
+    </div>
+    <div class="meta reveal d5">Version <span data-version>1.1.0</span> · Apple Silicon · macOS 26 or later · Nothing leaves your Mac</div>
+    <aside class="sizecard reveal d5" aria-label="A measured example">
+      <div class="file"><span>Lecture recording · 1 hour</span><span>1080p</span></div>
+      <div class="big" id="sizeNum">311 MB</div>
+      <div class="bar"><b id="sizeBar"></b></div>
+      <div class="foot"><span id="sizeState">Scroll to compress</span><b id="sizePct"></b></div>
+    </aside>
+  </div>
+</header>
+
+<main>
+<section id="results">
+  <div class="wrap">
+    <div class="eyebrow rise"><i></i>Measured, not promised</div>
+    <h2 class="rise">Every number here was measured on a Mac, on real footage.</h2>
+    <p class="lead rise">Cirrus doesn’t guess. It test-encodes your own video, scores the result with Netflix’s VMAF quality model, and reads the on-screen text back with Apple’s text recognition before it commits.</p>
+    <div class="stats rise">
+      <div class="stat">
+        <div class="k">A 1-hour lecture recording</div>
+        <div class="v num">311 MB <small>→</small> 80 MB</div>
+        <p>A typical screen recording of a one-hour slide lecture, 4× smaller. Every slide still reads perfectly, footnotes included.</p>
+        <div class="bars" aria-hidden="true"><i style="width:100%"></i><i class="b" style="width:26%"></i></div>
+        <span class="tag">HEVC · plays in Finder’s preview</span>
+      </div>
+      <div class="stat">
+        <div class="k">Captions on camera footage</div>
+        <div class="v num">1 in 8 <small>→</small> 1 in 50</div>
+        <p>Caption letters that came out too blurry to read. “Keep text readable” raises quality only where text needs it.</p>
+        <div class="dots" aria-hidden="true"><span>Without</span><b data-bad="6"></b><span>With</span><b data-bad="1"></b></div>
+        <span class="tag">Checked by reading the text back</span>
+      </div>
+      <div class="stat">
+        <div class="k">Animation and screen recordings</div>
+        <div class="v num">5× <small>smaller</small></div>
+        <p>Than H.264, the format most video uses, at the same picture quality. That’s AV1, the format behind YouTube and Netflix streams.</p>
+        <div class="bars" aria-hidden="true"><i style="width:100%"></i><i class="b" style="width:21%"></i></div>
+        <span class="tag">Measured on 8 test clips</span>
+      </div>
+    </div>
+
+    <div class="compare rise">
+      <div class="ba" id="ba" style="--split:50%">
+        <img data-before src="assets/lecture-original.jpg" alt="Lecture slide from the 346 MB ProRes original" width="1600" height="900" loading="lazy">
+        <img class="after" data-after src="assets/lecture-cirrus.jpg" alt="The same slide from the 246 KB file made by Cirrus" width="1600" height="900" loading="lazy">
+        <div class="handle" aria-hidden="true"></div>
+        <span class="lab l">Original · 346 MB</span><span class="lab r">Cirrus · 246 KB</span>
+        <input type="range" min="0" max="100" value="50" step="0.1" id="baRange" aria-label="Drag to compare the original with the Cirrus version">
+      </div>
+      <div class="ba-bar">
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" aria-pressed="true" data-view="full">Whole slide</button>
+          <button type="button" aria-pressed="false" data-view="detail">Small text, 2× pixels</button>
+        </div>
+        <div class="facts"><span>AV1 · <b>VMAF 95.4</b></span><span>Text read identically: <b>100 %</b></span><span><b class="num">1,406×</b> smaller</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background: var(--bg-2)">
+  <div class="wrap">
+    <div class="eyebrow rise"><i></i>How it works</div>
+    <h2 class="rise">It tests before it compresses.</h2>
+    <p class="lead rise">Most compressors apply one fixed setting to every video. A static lecture and a crowd scene need wildly different amounts of data, so Cirrus finds the right setting for each one.</p>
+    <div class="steps rise" id="steps">
+      <svg class="thread" viewBox="0 0 1000 70" preserveAspectRatio="none" aria-hidden="true"><path d="M30 34 C 250 34, 400 34, 600 34 S 900 34, 970 34"/></svg>
+      <div class="step"><div class="dot"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="7" width="24" height="16" rx="3"/><path d="M9 27h14M11 12h6M11 16h10"/></svg></div><span class="n">01</span><h3>Look</h3><p>Measures motion, detail, grain and noise, and finds slides, captions and other text.</p></div>
+      <div class="step"><div class="dot"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 9h6M5 16h10M5 23h6"/><path d="M18 9h9M20 16h7M18 23h9"/></svg></div><span class="n">02</span><h3>Test</h3><p>Encodes about 20 seconds of representative scenes at several settings.</p></div>
+      <div class="step"><div class="dot"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 24a11 11 0 0 1 22 0"/><path d="M16 24l6-8"/><circle cx="16" cy="24" r="1.6" fill="currentColor"/></svg></div><span class="n">03</span><h3>Measure</h3><p>Scores each one with VMAF and reads the text back, then keeps the smallest that passes.</p></div>
+      <div class="step"><div class="dot"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8c8 0 12 7 22 8M4 16h22M4 24c8 0 12-7 22-8"/><circle cx="27" cy="16" r="1.8" fill="currentColor"/></svg></div><span class="n">04</span><h3>Compress</h3><p>AV1, HEVC or H.264 with the measured setting, in two passes for size targets.</p></div>
+      <div class="step"><div class="dot" aria-hidden="true"></div><span class="n">05</span><h3>Verify</h3><p>Checks length, sound, size and text on the finished file. Your original is never touched.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="eyebrow rise"><i></i>What it does</div>
+    <h2 class="rise">Simple on the surface. Careful underneath.</h2>
+    <div class="features">
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><g fill="#fff"><rect x="40" y="34" width="150" height="10" rx="3" opacity=".95"/><rect x="40" y="54" width="210" height="7" rx="3" opacity=".75"/><rect x="40" y="69" width="180" height="7" rx="3" opacity=".75"/><rect x="40" y="90" width="120" height="4" rx="2" opacity=".55"/></g><g fill="none" stroke="#F2C2A0" stroke-width="1.5"><rect x="30" y="84" width="140" height="16" rx="4"/><path d="M170 92h40"/></g><text x="216" y="96" fill="#F2C2A0" font-family="Instrument Sans, sans-serif" font-size="12">smallest text · 18 px</text></svg></div>
+        <h3>Keeps text readable</h3>
+        <p>Finds the slides, captions and code in your video, then raises quality only until that text reads the same as in the original. It never shrinks the resolution past the point where the smallest text survives.</p>
+        <p class="fine">Captions on camera footage: <b>88 % → 98 %</b> legible.</p>
+      </article>
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><path d="M30 86 H330" stroke="rgba(255,255,255,.25)" stroke-width="1"/><path d="M30 60 H330" stroke="#F2C2A0" stroke-width="1.5" stroke-dasharray="4 5"/><text x="300" y="52" fill="#F2C2A0" font-family="Instrument Sans, sans-serif" font-size="12" text-anchor="end">your limit · 150 MB</text><rect x="60" y="64" width="210" height="22" rx="6" fill="#fff" opacity=".9"/><text x="72" y="80" fill="#14294D" font-family="Instrument Sans, sans-serif" font-size="12" font-weight="600">148.9 MB ✓</text></svg></div>
+        <h3>Hits an exact file size</h3>
+        <p>Ask for “under 25 MB” and that’s what you get. Cirrus subtracts the audio first, encodes in two passes, checks the file, and re-encodes if it came out even slightly over.</p>
+        <p class="fine">If a lower resolution would look better at your size, it measures that too.</p>
+      </article>
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><g fill="none" stroke="#fff"><rect x="34" y="26" width="90" height="68" rx="8" opacity=".9"/><rect x="135" y="26" width="90" height="68" rx="8" opacity=".55"/><rect x="236" y="26" width="90" height="68" rx="8" opacity=".35"/></g><g fill="#fff" font-family="Instrument Sans, sans-serif" font-size="12"><text x="46" y="48" font-weight="600">A</text><text x="147" y="48" font-weight="600" opacity=".7">B</text><text x="248" y="48" font-weight="600" opacity=".55">C</text><text x="46" y="80" opacity=".85">1.4 MB</text><text x="147" y="80" opacity=".65">0.8 MB</text><text x="248" y="80" opacity=".5">2.3 MB</text></g></svg></div>
+        <h3>Preview Studio</h3>
+        <p>Compare up to four options on your own video’s frames before you commit: exact sizes, dimensions, quality, text legibility and time, flipping between them at actual pixels.</p>
+        <p class="fine">The moments with the smallest text and the most motion are picked for you.</p>
+      </article>
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="1.4" opacity=".9"><path d="M40 30h40l8 8h60v52H40z"/><path d="M60 52h80M60 66h60M60 80h70" opacity=".6"/></g><g fill="none" stroke="#F2C2A0" stroke-width="1.5" stroke-linecap="round"><path d="M170 60c40 0 60 0 100 0"/><path d="M262 52l9 8-9 8"/></g><text x="282" y="64" fill="#fff" font-family="Instrument Sans, sans-serif" font-size="12">−82 %</text></svg></div>
+        <h3>Whole folders, done right</h3>
+        <p>Drop a folder of folders and every video is found. Compressed copies go next to the originals, or replace them: the original goes to the Trash only after its copy is verified, keeping its name and dates.</p>
+        <p class="fine">Other files are never touched. Earlier outputs are skipped automatically.</p>
+      </article>
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><rect x="110" y="20" width="140" height="80" rx="10" fill="rgba(255,255,255,.14)" stroke="#fff" stroke-opacity=".5"/><path d="M168 46l26 14-26 14z" fill="#fff"/><text x="180" y="112" fill="#fff" opacity=".8" font-family="Instrument Sans, sans-serif" font-size="11" text-anchor="middle">Space bar · Quick Look</text></svg></div>
+        <h3>Previews in Finder</h3>
+        <p>Files play with the space bar, in QuickTime and in Photos on your Mac. Cirrus knows which Macs can decode AV1 and uses HEVC where they can’t, or AV1 for the smallest files when you prefer.</p>
+        <p class="fine">Every result says whether it plays in Quick Look on this Mac.</p>
+      </article>
+      <article class="feature rise">
+        <div class="art"><svg viewBox="0 0 360 120" aria-hidden="true"><rect x="146" y="44" width="68" height="52" rx="10" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M158 44v-10a22 22 0 0 1 44 0v10" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="180" cy="68" r="6" fill="#F2C2A0"/></svg></div>
+        <h3>Private by design</h3>
+        <p>Everything happens on your Mac. Nothing is uploaded, there’s no account, and no analytics. The encoders (FFmpeg with SVT-AV1, x265, x264 and Opus) are built into the app.</p>
+        <p class="fine">Batches survive quitting and keep your Mac awake until they’re done.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="studio" style="background: var(--bg-2)">
+  <div class="wrap studio">
+    <div>
+      <div class="eyebrow rise"><i></i>Preview Studio</div>
+      <h2 class="rise">See it before you squeeze it.</h2>
+      <div class="bullets rise">
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 12h16M4 6h16M4 18h10"/></svg><span><b>Real frames, exact settings.</b> Each option encodes your chosen moments with exactly the settings the final file would use.</span></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span><b>Numbers before minutes.</b> Size, dimensions, VMAF, text legibility and encode time for every option.</span></div>
+        <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 6l-5 6 5 6M15 6l5 6-5 6"/></svg><span><b>Flip, don’t squint.</b> Arrow keys switch between the original and each option at actual pixels.</span></div>
+      </div>
+    </div>
+    <div class="window rise" aria-label="Illustration of the Preview Studio window">
+      <div class="bar"><i></i><i></i><i></i><span>Preview Studio</span></div>
+      <div class="stage">
+        <img id="studioImg" src="assets/lecture-detail-original.png" alt="Detail of a lecture slide as shown in Preview Studio" width="1280" height="720" loading="lazy">
+        <div class="tabs" id="studioTabs"><span class="on">Original</span><span>A · Your settings</span><span>B · Smaller</span></div>
+      </div>
+      <div class="opts">
+        <div class="opt on"><div class="h"><b>A</b>Your settings</div><dl><dt>Size</dt><dd>≈ 246 KB</dd><dt>Format</dt><dd>AV1 · 1080p</dd><dt>Quality</dt><dd>VMAF 95.4</dd><dt>Text</dt><dd class="good">100 % same</dd></dl></div>
+        <div class="opt"><div class="h"><b>B</b>HEVC</div><dl><dt>Size</dt><dd>≈ 715 KB</dd><dt>Format</dt><dd>HEVC · 1080p</dd><dt>Quality</dt><dd>VMAF 94.4</dd><dt>Quick Look</dt><dd class="good">Plays</dd></dl></div>
+        <div class="opt"><div class="h"><b>C</b>720p</div><dl><dt>Size</dt><dd>smaller</dd><dt>Format</dt><dd>AV1 · 720p</dd><dt>Smallest text</dt><dd class="warn">13 px</dd><dt>Advice</dt><dd class="warn">Keep 1080p</dd></dl></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="formats">
+  <div class="wrap">
+    <div class="eyebrow rise"><i></i>Formats, plainly</div>
+    <h2 class="rise">The right format for where it’s going.</h2>
+    <p class="lead rise">Cirrus explains every choice in plain English, with the trade-offs measured on real footage. These are the four you choose between.</p>
+    <div class="tablewrap rise">
+      <table>
+        <thead><tr><th>Format</th><th>Best for</th><th>File size, camera footage</th><th>File size, animation &amp; slides</th><th>Finder preview on M1/M2</th></tr></thead>
+        <tbody>
+          <tr><td><b>AV1</b><span class="sub">Smallest file</span></td><td>Uploads, archives, the web<span class="sub">Browsers, VLC, IINA, YouTube, M3+ Macs</span></td><td class="n">Smallest</td><td class="n">Smallest</td><td><span class="pill n">No</span></td></tr>
+          <tr><td><b>HEVC</b><span class="sub">Apple devices</span></td><td>Watching on Apple devices<span class="sub">Every modern Mac, iPhone, iPad, Apple TV</span></td><td class="n">7 % bigger</td><td class="n">2.2× bigger</td><td><span class="pill y">Yes</span></td></tr>
+          <tr><td><b>H.264</b><span class="sub">Plays everywhere</span></td><td>Sending to anyone<span class="sub">Old PCs, TVs, any editor</span></td><td class="n">28 % bigger</td><td class="n">4.6× bigger</td><td><span class="pill y">Yes</span></td></tr>
+          <tr><td><b>Hardware HEVC</b><span class="sub">Fastest</span></td><td>When time matters most<span class="sub">Apple Silicon media engine, 4–18× faster</span></td><td class="n">79 % bigger</td><td class="n">4.3× bigger</td><td><span class="pill y">Yes</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="src rise">Sizes compared with AV1 for the same picture quality. Median bitrate at equal VMAF (85–95) over 8 test clips, measured with SVT-AV1 4.3, x265 4.3, x264 and VideoToolbox on an M1 Max. Methodology and raw results are in the source repository.</p>
+  </div>
+</section>
+
+<section class="sky dl" id="download">
+  <canvas id="sky-dl" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="eyebrow rise" style="justify-content:center"><i></i>Free for macOS<i></i></div>
+    <h2 class="rise">Make room. Keep the picture.</h2>
+    <p class="lead rise">One download. Everything it needs is inside: no Homebrew, no command line, no account.</p>
+    <div class="ctas rise">
+      <a class="btn btn-light" href="#download" data-download data-pull><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v9m0 0L4.2 6.8M8 10.5l3.8-3.7M2.5 14h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download Cirrus <span data-version>1.1.0</span></a>
+      <a class="btn btn-ghost" href="#" data-source>Source code</a>
+    </div>
+    <div class="req rise"><span>Apple Silicon (M1 or later)</span><span>macOS 26 or later</span><span>22 MB download</span></div>
+    <div class="first rise">
+      <div><b>01 · OPEN</b>Open the downloaded file and drag Cirrus to Applications.</div>
+      <div><b>02 · FIRST LAUNCH</b>macOS can’t check apps from independent developers, so right-click Cirrus and choose <em>Open</em>.</div>
+      <div><b>03 · CONFIRM</b>Click <em>Open</em> once more. From then on it opens like any other app.</div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap faq">
+    <div><div class="eyebrow rise"><i></i>Questions</div><h2 class="rise" style="margin-top:18px">Good to know.</h2></div>
+    <div class="rise">
+      <details><summary>Is it really free?</summary><p>Yes. There’s no trial, account or subscription. The source code is public.</p></details>
+      <details><summary>Does it upload my videos?</summary><p>No. Analysis, compression and quality measurement all run on your Mac. Cirrus doesn’t connect to the internet.</p></details>
+      <details><summary>Why does macOS warn me the first time I open it?</summary><p>Apple only pre-approves apps from developers in its paid programme. Cirrus is signed but not notarised, so the first launch needs right-click → Open. After that it opens normally.</p></details>
+      <details><summary>Will my original be changed?</summary><p>Not unless you choose “Replace originals”. Even then, the original only goes to the Trash after the compressed copy is finished and verified to play, be the same length, have its sound, and be smaller. You can restore it from the Trash.</p></details>
+      <details><summary>Why HEVC and not AV1 on my Mac?</summary><p>M1 and M2 Macs can’t decode AV1 in Finder’s preview, QuickTime or Photos. Cirrus uses HEVC there so your files just play. Choose “AV1 · Smallest” under Format to get AV1, which is smaller.</p></details>
+      <details><summary>What is VMAF?</summary><p>A model of how people judge video quality, developed by Netflix with university researchers. Cirrus uses it to aim for a quality level (93 for Balanced, 97 for Maximum) and to measure every finished file. It under-rates text sharpness, which is why text is checked separately.</p></details>
+      <details><summary>Does it work on Intel Macs or older macOS?</summary><p>Not yet. This version needs Apple Silicon and macOS 26 or later.</p></details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <a class="brand" href="#top"><img src="assets/icon-256.png" alt="" width="30" height="30">Cirrus</a>
+      <nav aria-label="Footer"><a href="#download">Download</a><a href="#" data-source>Source code</a><a href="#" data-releases>Release notes</a><a href="#faq">FAQ</a></nav>
+    </div>
+    <p class="legal">© 2026 Cirrus. Cirrus Video Compressor includes FFmpeg, SVT-AV1, x265, x264, Opus and libvmaf, distributed under their own licences; FFmpeg in this build is licensed under the GPL, and its source code is available from ffmpeg.org. Quality figures are measurements on the test footage described in the repository and will differ for other videos.</p>
+  </div>
+</footer>
+
+<script>
+/* Where downloads come from: set once when the GitHub repository exists. */
+const CIRRUS = { repo: "drwojakmd/cirrus-video-compressor", version: "1.1.0", asset: "Cirrus-Video-Compressor.dmg" };
+
+(() => {
+  // links
+  if (CIRRUS.repo) {
+    const gh = `https://github.com/${CIRRUS.repo}`;
+    document.querySelectorAll('[data-download]').forEach(a => a.href = `${gh}/releases/latest/download/${CIRRUS.asset}`);
+    document.querySelectorAll('[data-source]').forEach(a => a.href = gh);
+    document.querySelectorAll('[data-releases]').forEach(a => a.href = `${gh}/releases`);
+  }
+  document.querySelectorAll('[data-version]').forEach(e => e.textContent = CIRRUS.version);
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ease = t => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+  const bez = (a, b, c, d, t) => { const u = 1 - t; return u*u*u*a + 3*u*u*t*b + 3*u*t*t*c + t*t*t*d; };
+
+  /* The cirrus sky: depth-layered streaks converging on a dawn point, drawn live. */
+  function Sky(canvas, opts) {
+    const ctx = canvas.getContext('2d'), host = canvas.parentElement;
+    let W = 0, H = 0, DPR = 1, mobile = false, visible = true;
+    const mouse = { x: -1e4, y: -1e4, active: false };
+    const state = { pull: 0, pullTarget: 0, conv: 0 };
+    const streaks = [], pulses = [];
+    let nextPulse = 2.8;
+    const t0 = performance.now() - (opts.skipIntro ? 4000 : 0);
+
+    function build() {
+      streaks.length = 0;
+      const layers = mobile ? [[0.45, 5], [0.75, 4], [1, 3]] : [[0.45, 9], [0.75, 7], [1, 6]];
+      let k = 0;
+      for (const [depth, n] of layers) for (let i = 0; i < n; i++) {
+        const f = (i + 0.5) / n;
+        streaks.push({ depth, f,
+          spread: (f - 0.5) * (0.42 + depth * 0.22) + (depth - 0.75) * 0.06,
+          phase: Math.random() * 6.283, speed: 0.05 + Math.random() * 0.05 + depth * 0.02,
+          width: (0.5 + depth * 1.5) * (1.25 - Math.abs(f - 0.5)) * (mobile ? 0.8 : 1),
+          alpha: 0.12 + depth * 0.5 * (1 - Math.abs(f - 0.5) * 0.9),
+          delay: 0.08 * k++ + depth * 0.05, off: new Float32Array(64) });
+      }
+    }
+    function resize() {
+      DPR = Math.min(2, devicePixelRatio || 1);
+      const r = host.getBoundingClientRect();
+      W = r.width; H = r.height; mobile = W < 760;
+      canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+      build(); if (reduce) draw(performance.now(), true);
+    }
+    const point = () => ({ x: W * (mobile ? Math.max(opts.px, 0.86) : opts.px), y: H * (mobile ? (opts.mpy ?? 0.24) : opts.py) });
+
+    function draw(now, still) {
+      const t = (now - t0) / 1000;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      const P = point();
+      state.pull += (state.pullTarget - state.pull) * 0.06;
+      const squeeze = 1 - Math.min(0.92, state.conv * 0.92 + state.pull * 0.28);
+      const N = 64;
+      ctx.globalCompositeOperation = 'lighter';
+      for (const s of streaks) {
+        const appear = still ? 1 : ease((t - 0.15 - s.delay * 0.6) / 1.4);
+        if (appear <= 0) continue;
+        const drift = still ? 0 : Math.sin(t * s.speed * 2 + s.phase) * H * 0.018 * s.depth + Math.sin(t * s.speed * 0.7 + s.phase * 1.7) * H * 0.01;
+        const y0 = P.y + (s.spread * H + drift) * squeeze, x0 = -W * 0.05;
+        const c1x = W * (0.32 + 0.04 * Math.sin(t * 0.05 + s.phase)), c1y = y0, c2x = W * 0.6, c2y = P.y + (y0 - P.y) * 0.26;
+        const ex = P.x, ey = P.y + (y0 - P.y) * 0.015;
+        const pts = [], last = Math.max(2, Math.round(N * appear));
+        for (let i = 0; i < last; i++) {
+          const u = i / (N - 1);
+          let x = bez(x0, c1x, c2x, ex, u), y = bez(y0, c1y, c2y, ey, u);
+          let target = 0;
+          if (mouse.active && !mobile) {
+            const dx = x - mouse.x, dy = y - mouse.y, d2 = dx*dx + dy*dy, R = 190 + s.depth * 60;
+            target = (-dy / (Math.sqrt(d2) + 30)) * 46 * s.depth * Math.exp(-d2 / (R*R)) * (1 - u*u);
+          }
+          s.off[i] += (target - s.off[i]) * (still ? 1 : 0.07);
+          pts.push(x, y + s.off[i]);
+        }
+        const mid = (pts.length / 4 | 0) * 2;
+        const near = mouse.active && !mobile ? Math.exp(-((pts[mid] - mouse.x) ** 2 + (pts[mid+1] - mouse.y) ** 2) / 60000) : 0;
+        const a = Math.min(1, s.alpha * (opts.dim ?? 1) * (1 + near * 0.6 + state.pull * 0.35));
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(pts[0], pts[1]);
+        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i+1]);
+        const haze = ctx.createLinearGradient(x0, 0, ex, 0);
+        haze.addColorStop(0, 'rgba(220,232,248,0)'); haze.addColorStop(0.45, `rgba(220,232,248,${a * 0.05})`); haze.addColorStop(1, `rgba(255,236,222,${a * 0.12})`);
+        ctx.strokeStyle = haze; ctx.lineWidth = s.width * (7 + s.depth * 7); ctx.stroke();
+        const g = ctx.createLinearGradient(x0, 0, ex, 0);
+        g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.35, `rgba(255,255,255,${a * 0.45})`); g.addColorStop(1, `rgba(255,255,255,${a})`);
+        ctx.strokeStyle = g; ctx.lineWidth = s.width; ctx.stroke();
+        s.pts = pts;
+      }
+      if (!still) {
+        if (t > nextPulse) {
+          const s = streaks[(Math.random() * streaks.length) | 0];
+          if (s && s.depth > 0.5) pulses.push({ s, born: t, dur: 2.2 + Math.random() * 1.2 });
+          nextPulse = t + 1.6 + Math.random() * 2.4;
+        }
+        for (let i = pulses.length - 1; i >= 0; i--) {
+          const p = pulses[i], k = (t - p.born) / p.dur;
+          if (k >= 1 || !p.s.pts) { pulses.splice(i, 1); continue; }
+          const pts = p.s.pts, n = pts.length / 2, head = Math.min(n - 1, Math.floor(ease(k) * (n - 1))), tail = Math.max(0, head - 9);
+          const g = ctx.createLinearGradient(pts[tail*2], pts[tail*2+1], pts[head*2], pts[head*2+1]);
+          g.addColorStop(0, 'rgba(255,240,228,0)'); g.addColorStop(1, `rgba(255,240,228,${0.9 * Math.sin(Math.PI * k)})`);
+          ctx.strokeStyle = g; ctx.lineWidth = p.s.width + 1.6;
+          ctx.beginPath(); ctx.moveTo(pts[tail*2], pts[tail*2+1]);
+          for (let j = tail + 1; j <= head; j++) ctx.lineTo(pts[j*2], pts[j*2+1]);
+          ctx.stroke();
+        }
+      }
+      const ignite = still ? 1 : ease((t - 1.0) / 0.9);
+      if (ignite > 0) {
+        const breathe = still ? 1 : 1 + Math.sin(t * 1.1) * 0.06;
+        const R = (mobile ? 90 : 150) * (opts.glowSize ?? 1) * breathe * (1 + state.pull * 0.35 + state.conv * 0.25) * ignite;
+        const glow = ctx.createRadialGradient(P.x, P.y, 0, P.x, P.y, R);
+        const gk = opts.glow ?? 1;
+        glow.addColorStop(0, `rgba(255,236,220,${0.8 * ignite * gk})`); glow.addColorStop(0.18, `rgba(248,200,165,${(0.4 + state.pull * 0.2) * ignite * gk})`); glow.addColorStop(1, 'rgba(242,194,160,0)');
+        ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(P.x, P.y, R, 0, 6.283); ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
+        if (opts.core !== false) { ctx.fillStyle = `rgba(255,255,255,${ignite})`; ctx.beginPath(); ctx.arc(P.x, P.y, (mobile ? 4 : 5.5) * (1 + state.pull * 0.25), 0, 6.283); ctx.fill(); }
+      }
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    function loop(now) { if (visible && !document.hidden) draw(now, false); requestAnimationFrame(loop); }
+    host.addEventListener('pointermove', e => { const r = host.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.active = e.pointerType === 'mouse'; });
+    host.addEventListener('pointerleave', () => { mouse.active = false; });
+    new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && reduce) draw(performance.now(), true); }).observe(host);
+    addEventListener('resize', resize);
+    resize();
+    if (reduce) draw(performance.now(), true); else requestAnimationFrame(loop);
+    return { state, redraw: () => reduce && draw(performance.now(), true) };
+  }
+
+  // hero: the streaks converge just beyond the right edge; only a faint warmth shows where
+  const hero = Sky(document.getElementById('sky-hero'), { px: 1.06, py: 0.36, core: false, glow: 0.55, glowSize: 2.2 });
+  // download: the streaks sweep low and meet beyond the bottom-right corner, well clear of the text
+  const dl = Sky(document.getElementById('sky-dl'), { px: 1.08, py: 0.9, core: false, glow: 0.4, glowSize: 1.8, dim: 0.75, mpy: 0.94, skipIntro: true });
+  document.querySelectorAll('[data-pull]').forEach(b => {
+    const sky = b.closest('#download') ? dl : hero;
+    const on = () => { sky.state.pullTarget = 1; if (b.closest('nav')) hero.state.pullTarget = 1; };
+    const off = () => { sky.state.pullTarget = 0; hero.state.pullTarget = 0; };
+    b.addEventListener('pointerenter', on); b.addEventListener('pointerleave', off); b.addEventListener('focus', on); b.addEventListener('blur', off);
+  });
+
+  // scroll: the hero converges and the measured example compresses
+  const nav = document.getElementById('nav'), heroEl = document.getElementById('top');
+  const num = document.getElementById('sizeNum'), bar = document.getElementById('sizeBar'), pct = document.getElementById('sizePct'), st = document.getElementById('sizeState');
+  const FROM = 311355937, TO = 80121862;   // measured: 1-hour lecture recording (Benchmarks/make_long_lecture.py), default settings
+  const fmt = b => b >= 1e9 ? (b / 1e9).toFixed(2) + ' GB' : b >= 1e6 ? Math.round(b / 1e6) + ' MB' : Math.round(b / 1e3) + ' KB';
+  function onScroll() {
+    const h = heroEl.offsetHeight;
+    hero.state.conv = Math.min(1, Math.max(0, scrollY / (h * 0.75)));
+    nav.classList.toggle('solid', scrollY > h - 90);
+    const k = ease(hero.state.conv), bytes = FROM * Math.pow(TO / FROM, k);
+    num.textContent = fmt(bytes);
+    bar.style.transform = `scaleX(${Math.max(0.004, Math.log(bytes / TO) / Math.log(FROM / TO))})`;
+    pct.textContent = k > 0.02 ? Math.max(1, Math.round(FROM / bytes)) + '× smaller' : '';
+    st.textContent = k > 0.98 ? 'Done · 4× smaller, every slide still sharp' : k > 0.02 ? 'Compressing…' : 'Scroll to compress';
+    hero.redraw();
+  }
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // letter dots: 50 letters, the misread ones in dawn
+  document.querySelectorAll('.dots b').forEach(b => {
+    const bad = +b.dataset.bad, marks = new Set([...Array(bad)].map((_, k) => Math.round((k + 0.5) * 50 / bad)));
+    for (let i = 0; i < 50; i++) { const d = document.createElement('i'); if (marks.has(i)) d.className = 'x'; b.appendChild(d); } });
+
+  // gentle entrances
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+  // before / after
+  const ba = document.getElementById('ba'), range = document.getElementById('baRange');
+  range.addEventListener('input', () => ba.style.setProperty('--split', range.value + '%'));
+  const views = { full: ['assets/lecture-original.jpg', 'assets/lecture-cirrus.jpg'], detail: ['assets/lecture-detail-original.png', 'assets/lecture-detail-cirrus.png'] };
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-view]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    const [bf, af] = views[b.dataset.view];
+    ba.querySelector('[data-before]').src = bf; ba.querySelector('[data-after]').src = af;
+    ba.classList.toggle('pixel', b.dataset.view === 'detail');
+  }));
+  if (!reduce) {     // a one-time hint that the divider moves
+    const once = new IntersectionObserver(es => { if (!es[0].isIntersecting) return; once.disconnect();
+      const s = performance.now();
+      (function hint(n) { const k = (n - s) / 1600; if (k > 1) { ba.style.setProperty('--split', '50%'); return; }
+        ba.style.setProperty('--split', (50 + Math.sin(k * Math.PI * 2) * 12) + '%'); requestAnimationFrame(hint); })(s);
+    }, { threshold: 0.6 });
+    once.observe(ba);
+  }
+
+  // studio illustration: flip between the original and option A, like the arrow keys do
+  const sImg = document.getElementById('studioImg'), tabs = [...document.querySelectorAll('#studioTabs span')];
+  let si = 0;
+  if (!reduce) setInterval(() => {
+    si = (si + 1) % 2;
+    sImg.src = si ? 'assets/lecture-detail-cirrus.png' : 'assets/lecture-detail-original.png';
+    tabs.forEach((t, i) => t.classList.toggle('on', i === si));
+  }, 2600);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+ "live_park_joy": {
+  "svtav1_p4": 21.3,
+  "svtav1_p6": 34.9,
+  "svtav1_p8": 52.8,
+  "svtav1_p10": 74.6,
+  "x265_slow": 7.9,
+  "x265_medium": 18.9,
+  "x264_slow": 28.5,
+  "vt_hevc": 141.3,
+  "vt_h264": 145.6,
+  "vp9_cpu2": 9.2
+ },
+ "talking_head": {
+  "svtav1_p4": 78.8,
+  "svtav1_p6": 112.7,
+  "svtav1_p8": 183.1,
+  "svtav1_p10": 274.5,
+  "x265_slow": 35.5,
+  "x265_medium": 89.7,
+  "x264_slow": 176.2,
+  "vt_hevc": 297.5,
+  "vt_h264": 326.8,
+  "vp9_cpu2": 54.8
+ }
+}

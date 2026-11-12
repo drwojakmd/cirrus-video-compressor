@@ -1,0 +1,514 @@
+<title>Cirrus Identity Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600&family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Sora:wght@300;400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column of direction "plates", each pairing a large icon with its wordmark, palette and verdict; then the recommended system in detail. */
+:root {
+  --bg: #F4F6F9;
+  --surface: #FFFFFF;
+  --fg: #0F1726;
+  --muted: #5A6A80;
+  --line: #DCE3EC;
+  --accent: #3A6AAE;
+  --dawn: #D98E62;
+  --good: #2F7D5B;
+  --warn: #A3622A;
+  --win-bg: #F7F9FC;
+  --win-side: #EDF1F6;
+  --win-line: #DDE4ED;
+  --win-fg: #101826;
+  --win-muted: #66768C;
+  --ribbon: #6E9CCB;
+  --display: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "Instrument Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --serif: "Instrument Serif", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #090E17; --surface: #101827; --fg: #E7EDF5; --muted: #8C9AAF; --line: #1E2A3C;
+  --accent: #8FB6E8; --dawn: #F0B28C; --good: #6FC79E; --warn: #E3A46B;
+  --win-bg: #0F1625; --win-side: #131C2D; --win-line: #22304A; --win-fg: #E4EBF5; --win-muted: #8796AD; --ribbon: #8FB6E8;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #090E17; --surface: #101827; --fg: #E7EDF5; --muted: #8C9AAF; --line: #1E2A3C;
+  --accent: #8FB6E8; --dawn: #F0B28C; --good: #6FC79E; --warn: #E3A46B;
+  --win-bg: #0F1625; --win-side: #131C2D; --win-line: #22304A; --win-fg: #E4EBF5; --win-muted: #8796AD; --ribbon: #8FB6E8;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); -webkit-font-smoothing: antialiased }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 56px 96px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0 }
+h1 { font-weight: 300; font-size: clamp(36px, 6vw, 60px); letter-spacing: -0.02em; line-height: 1.05 }
+h2 { font-weight: 400; font-size: clamp(24px, 3.4vw, 32px); letter-spacing: -0.01em }
+h3 { font-weight: 500; font-size: 17px }
+p { margin: 0; max-width: 66ch }
+.eyebrow { font: 500 11.5px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+.lede { font-size: 17px; color: var(--muted); max-width: 60ch }
+section { display: grid; gap: 22px; padding-block: 56px; border-top: 1px solid var(--line) }
+header.top { display: grid; gap: 18px; padding-bottom: 40px }
+.stack { display: grid; gap: 12px }
+
+/* direction plates */
+.plate { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 36px; align-items: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px }
+.plate.rec { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) }
+.iconstage { display: grid; gap: 18px; justify-items: center }
+.iconstage .big { width: 100%; max-width: 260px; aspect-ratio: 1; filter: drop-shadow(0 18px 28px rgba(16, 30, 60, .22)) }
+.sizes { display: flex; gap: 14px; align-items: end }
+.sizes svg { display: block }
+.sizes span { font: 10.5px var(--mono); color: var(--muted); display: block; text-align: center; margin-top: 4px }
+.plate-body { display: grid; gap: 18px; min-width: 0 }
+.plate-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 16px }
+.tag { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 6px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted) }
+.tag.rec { background: var(--accent); color: var(--surface); border-color: var(--accent) }
+.wordmark { padding: 22px 24px; border-radius: 14px; border: 1px solid var(--line); display: flex; align-items: center; gap: 16px; overflow: hidden }
+.wordmark svg { width: 46px; height: 46px; flex: none }
+.wm-name { line-height: 1 }
+.wm-sub { font: 400 12.5px var(--body); color: var(--muted); margin-top: 6px; letter-spacing: .01em }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px }
+.sw { display: grid; gap: 6px; width: 86px }
+.sw i { display: block; height: 40px; border-radius: 9px; border: 1px solid rgba(127, 140, 160, .25) }
+.sw b { font: 500 11.5px var(--body) } .sw small { font: 10.5px var(--mono); color: var(--muted) }
+.pc { display: grid; grid-template-columns: 1fr 1fr; gap: 18px }
+.pc ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 5px; color: var(--fg) }
+.pc h4 { margin: 0; font: 600 12px var(--body); letter-spacing: .04em; text-transform: uppercase }
+.pc .pro h4 { color: var(--good) } .pc .con h4 { color: var(--warn) }
+
+/* recommended system */
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 24px; display: grid; gap: 12px; min-width: 0; align-content: start }
+.typespec { display: grid; gap: 14px }
+.typespec div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 12px }
+.typespec small { font: 11px var(--mono); color: var(--muted) }
+
+/* window mockups */
+.win { border-radius: 14px; overflow: hidden; border: 1px solid var(--win-line); background: var(--win-bg); color: var(--win-fg);
+  box-shadow: 0 24px 60px rgba(10, 20, 40, .18); font: 13px/1.4 -apple-system, "Instrument Sans", sans-serif }
+.win.light { --win-bg: #F7F9FC; --win-side: #EDF1F6; --win-line: #DDE4ED; --win-fg: #101826; --win-muted: #66768C; --ribbon: #6E9CCB; --wacc: #3A6AAE }
+.win.dark { --win-bg: #0F1625; --win-side: #131C2D; --win-line: #22304A; --win-fg: #E4EBF5; --win-muted: #8796AD; --ribbon: #8FB6E8; --wacc: #8FB6E8 }
+.bar { height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 14px; border-bottom: 1px solid var(--win-line); background: var(--win-side) }
+.bar i { width: 11px; height: 11px; border-radius: 50%; background: #FF5F57 } .bar i:nth-child(2) { background: #FEBC2E } .bar i:nth-child(3) { background: #28C840 }
+.bar span { margin-left: auto; margin-right: auto; font-weight: 600; font-size: 12.5px; color: var(--win-muted) }
+.wbody { display: grid; grid-template-columns: 190px minmax(0, 1fr); min-height: 330px }
+.side { background: var(--win-side); border-right: 1px solid var(--win-line); padding: 12px 8px; display: grid; gap: 4px; align-content: start }
+.row { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 8px; padding: 7px 8px; border-radius: 8px; align-items: center }
+.row.sel { background: color-mix(in srgb, var(--wacc) 18%, transparent) }
+.row .th { height: 22px; border-radius: 4px; background: linear-gradient(160deg, #39557E, #A9BFD8) }
+.row b { font-weight: 500; font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.row small { color: var(--win-muted); font-size: 11px; font-variant-numeric: tabular-nums }
+.main { padding: 18px 20px; display: grid; gap: 14px; align-content: start; min-width: 0 }
+.ba { position: relative; aspect-ratio: 16 / 7.2; border-radius: 10px; overflow: hidden; background: linear-gradient(180deg, #1F3B66, #6D97C6 60%, #E9C3A6) }
+.ba .slide { position: absolute; inset: 14% 22% 18% 22%; border-radius: 4px; background: #F6F8FB; display: grid; align-content: center; justify-items: center; gap: 6px; color: #1A2638; font: 600 12px var(--body) }
+.ba .slide small { font: 400 9px var(--body); color: #4E5D72 }
+.ba .half { position: absolute; inset: 0 0 0 50%; backdrop-filter: blur(0.6px) saturate(.92); border-left: 2px solid #fff }
+.ba .lbl { position: absolute; bottom: 8px; font: 600 10px var(--body); color: #fff; background: rgba(0, 0, 0, .35); padding: 3px 7px; border-radius: 5px }
+.seg { display: inline-flex; border: 1px solid var(--win-line); border-radius: 8px; overflow: hidden; font-size: 12px }
+.seg span { padding: 5px 10px; border-right: 1px solid var(--win-line) } .seg span:last-child { border: 0 }
+.seg .on { background: var(--wacc); color: var(--win-bg); font-weight: 600 }
+.ctl { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 12px; color: var(--win-muted) }
+.est { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--win-muted) }
+.est b { color: var(--win-fg); font-size: 15px; font-weight: 600 }
+.prog { display: grid; gap: 6px }
+.prog svg { width: 100%; height: 46px; display: block }
+.btn { justify-self: end; background: var(--wacc); color: var(--win-bg); font-weight: 600; font-size: 12.5px; padding: 6px 14px; border-radius: 7px }
+
+/* hero mock */
+.hero { border-radius: 18px; overflow: hidden; position: relative; min-height: 340px; display: grid; align-content: end; padding: 36px;
+  background: linear-gradient(180deg, #0D1B36 0%, #22426F 45%, #6E95C2 78%, #EBC4A5 100%); color: #fff }
+.hero svg.sky { position: absolute; inset: 0; width: 100%; height: 100% }
+.hero > div { position: relative; display: grid; gap: 12px }
+.hero h2 { font-weight: 300; font-size: clamp(30px, 5vw, 52px); letter-spacing: -0.02em; color: #fff }
+.hero p { color: rgba(255, 255, 255, .82) }
+.hero .cta { display: flex; gap: 10px; flex-wrap: wrap }
+.hero .cta span { background: #fff; color: #0D1B36; padding: 9px 16px; border-radius: 99px; font-weight: 600; font-size: 13px }
+.hero .cta span + span { background: rgba(255, 255, 255, .14); color: #fff }
+
+.motion svg { width: 100%; height: 120px; display: block; background: linear-gradient(180deg, #13284A, #4F7CB3); border-radius: 12px }
+.draw path { stroke-dasharray: 900; stroke-dashoffset: 900; animation: draw 4.8s cubic-bezier(.45, 0, .2, 1) infinite }
+.draw path:nth-child(2) { animation-delay: .15s } .draw path:nth-child(3) { animation-delay: .3s } .draw path:nth-child(4) { animation-delay: .45s } .draw path:nth-child(5) { animation-delay: .6s }
+@keyframes draw { 0% { stroke-dashoffset: 900 } 55%, 85% { stroke-dashoffset: 0 } 100% { stroke-dashoffset: 0; opacity: 0 } }
+.drift path { animation: drift 7s ease-in-out infinite alternate }
+.drift path:nth-child(even) { animation-duration: 9s }
+@keyframes drift { from { transform: translateX(-14px) } to { transform: translateX(14px) } }
+@media (prefers-reduced-motion: reduce) { .draw path { animation: none; stroke-dashoffset: 0 } .drift path { animation: none } }
+
+table.audit { width: 100%; border-collapse: collapse; font-size: 13.5px }
+.tablewrap { overflow-x: auto }
+table.audit th, table.audit td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top }
+table.audit th { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+code { font: 12.5px var(--mono); background: color-mix(in srgb, var(--accent) 10%, transparent); padding: 1px 5px; border-radius: 5px }
+
+@media (max-width: 820px) {
+  .plate { grid-template-columns: 1fr; padding: 22px } .grid2, .grid3, .pc { grid-template-columns: 1fr }
+  .wbody { grid-template-columns: 1fr } .side { display: none } .typespec div { grid-template-columns: 1fr }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="sq"><rect x="100" y="100" width="824" height="824" rx="185"/></clipPath>
+    <!-- A: Convergence -->
+    <linearGradient id="a-sky" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#14294D"/><stop offset=".5" stop-color="#4D7DB8"/><stop offset=".82" stop-color="#BFD3EA"/><stop offset="1" stop-color="#F2C2A0"/>
+    </linearGradient>
+    <linearGradient id="a-rib" x1="120" y1="0" x2="790" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".4" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="1"/>
+    </linearGradient>
+    <radialGradient id="a-glow" cx="790" cy="470" r="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFF4EA" stop-opacity=".95"/><stop offset=".25" stop-color="#FFE3CC" stop-opacity=".45"/><stop offset="1" stop-color="#FFE3CC" stop-opacity="0"/>
+    </radialGradient>
+    <symbol id="iconA" viewBox="0 0 1024 1024">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#a-sky)"/>
+      <g clip-path="url(#sq)" fill="none" stroke="url(#a-rib)" stroke-linecap="round">
+        <path d="M40 230 C360 230 560 410 790 466" stroke-width="16" opacity=".55"/>
+        <path d="M40 320 C360 320 560 432 790 468" stroke-width="26" opacity=".7"/>
+        <path d="M40 410 C360 410 560 455 790 470" stroke-width="38"/>
+        <path d="M40 520 C360 520 560 482 790 472" stroke-width="30" opacity=".85"/>
+        <path d="M40 630 C360 630 560 508 790 474" stroke-width="20" opacity=".65"/>
+        <path d="M40 735 C360 735 560 532 790 476" stroke-width="12" opacity=".45"/>
+      </g>
+      <circle cx="790" cy="470" r="120" fill="url(#a-glow)"/>
+      <circle cx="790" cy="471" r="15" fill="#fff"/>
+    </symbol>
+    <!-- A small-size variant: fewer, heavier ribbons -->
+    <symbol id="iconAs" viewBox="0 0 1024 1024">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#a-sky)"/>
+      <g clip-path="url(#sq)" fill="none" stroke="url(#a-rib)" stroke-linecap="round">
+        <path d="M60 300 C360 300 560 440 790 468" stroke-width="56" opacity=".75"/>
+        <path d="M60 470 C360 470 560 470 790 470" stroke-width="72"/>
+        <path d="M60 650 C360 650 560 500 790 472" stroke-width="56" opacity=".75"/>
+      </g>
+      <circle cx="790" cy="470" r="44" fill="#fff"/>
+    </symbol>
+
+    <!-- B: Vapour frame -->
+    <linearGradient id="b-bg" x1="100" y1="100" x2="924" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1532"/><stop offset="1" stop-color="#26457F"/>
+    </linearGradient>
+    <linearGradient id="b-wisp" x1="660" y1="0" x2="960" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <symbol id="iconB" viewBox="0 0 1024 1024">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#b-bg)"/>
+      <g clip-path="url(#sq)" fill="none" stroke-linecap="round">
+        <rect x="250" y="350" width="420" height="320" rx="44" stroke="#fff" stroke-width="26"/>
+        <path d="M670 420 C760 410 830 360 960 300" stroke="url(#b-wisp)" stroke-width="20"/>
+        <path d="M670 510 C780 505 860 470 980 440" stroke="url(#b-wisp)" stroke-width="14"/>
+        <path d="M670 600 C770 610 860 590 970 570" stroke="url(#b-wisp)" stroke-width="9"/>
+        <path d="M430 450 L520 510 L430 570 Z" fill="#fff" stroke="#fff" stroke-width="14" stroke-linejoin="round"/>
+      </g>
+    </symbol>
+
+    <!-- C: Ice-crystal aperture -->
+    <linearGradient id="c-bg" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F3F7FC"/><stop offset="1" stop-color="#C6D7EB"/>
+    </linearGradient>
+    <symbol id="iconC" viewBox="0 0 1024 1024">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#c-bg)"/>
+      <g stroke="#E6EEF7" stroke-width="14" stroke-linejoin="round">
+        <path d="M512 512 L512 252 L737 382 Z" fill="#FFFFFF"/>
+        <path d="M512 512 L737 382 L737 642 Z" fill="#D7E4F3"/>
+        <path d="M512 512 L737 642 L512 772 Z" fill="#9FBCDD"/>
+        <path d="M512 512 L512 772 L287 642 Z" fill="#6F97C6"/>
+        <path d="M512 512 L287 642 L287 382 Z" fill="#8DB0D8"/>
+        <path d="M512 512 L287 382 L512 252 Z" fill="#E4EDF8"/>
+      </g>
+      <path d="M512 452 L564 482 L564 542 L512 572 L460 542 L460 482 Z" fill="#1E3A64"/>
+    </symbol>
+
+    <!-- D: Mare's tail brushstroke -->
+    <linearGradient id="d-bg" x1="0" y1="100" x2="0" y2="924" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FAFBFD"/><stop offset="1" stop-color="#D9E4F1"/>
+    </linearGradient>
+    <linearGradient id="d-ink" x1="230" y1="700" x2="800" y2="280" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1B3156" stop-opacity=".25"/><stop offset=".45" stop-color="#1B3156"/><stop offset="1" stop-color="#3D6AA8"/>
+    </linearGradient>
+    <symbol id="iconD" viewBox="0 0 1024 1024">
+      <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#d-bg)"/>
+      <path d="M210 700 C420 690 600 620 712 455 C752 396 778 336 796 276 C822 330 816 418 768 492 C652 670 452 735 210 712 Z" fill="url(#d-ink)"/>
+      <path d="M260 770 C450 770 590 730 690 650" fill="none" stroke="#1B3156" stroke-opacity=".35" stroke-width="10" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Identity exploration · v1</span>
+    <h1>Cirrus Video Compressor</h1>
+    <p class="lede">Four distinct directions for the new identity, judged side by side, followed by the recommended system: palette, type, motion, the app window and the website. Nothing here is built into the app yet.</p>
+  </header>
+
+  <section>
+    <div class="stack">
+      <span class="eyebrow">The brief, distilled</span>
+      <h2>Cirrus clouds are thin, high and fast. So is a well-compressed file.</h2>
+    </div>
+    <p>Cirrus forms at 6–12 km, made of ice crystals rather than droplets, stretched into fine streaks by high-altitude wind. Those are the useful ideas: lightness (almost no mass), height (premium, above the noise), and streaks that converge toward the horizon. The trap is the puffy cumulus cloud, which every cloud-storage product already owns. All four directions avoid it.</p>
+  </section>
+
+  <section>
+    <div class="stack">
+      <span class="eyebrow">Directions</span>
+      <h2>Four genuinely different routes</h2>
+    </div>
+
+    <!-- A -->
+    <article class="plate rec">
+      <div class="iconstage">
+        <svg class="big" viewBox="0 0 1024 1024" role="img" aria-label="Direction A icon"><use href="#iconA"/></svg>
+        <div class="sizes">
+          <div><svg width="64" height="64"><use href="#iconA"/></svg><span>64</span></div>
+          <div><svg width="32" height="32"><use href="#iconAs"/></svg><span>32</span></div>
+          <div><svg width="16" height="16"><use href="#iconAs"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="plate-body">
+        <div class="plate-head"><h3>A · Convergence</h3><span class="tag rec">Recommended</span></div>
+        <p>Six cirrus streaks sweep across a high-altitude dawn sky and converge on one bright point: a lot of material made into something small and luminous. The gradient runs from stratospheric blue down to a warm horizon, which gives the icon its own colour in the Dock without leaning on a symbol.</p>
+        <div class="wordmark" style="background:linear-gradient(180deg,#14294D,#4D7DB8)">
+          <svg viewBox="0 0 1024 1024"><use href="#iconA"/></svg>
+          <div><div class="wm-name" style="font:300 40px var(--display);letter-spacing:.01em;color:#fff">Cirrus</div><div class="wm-sub" style="color:rgba(255,255,255,.75)">Video Compressor</div></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><i style="background:#14294D"></i><b>Altitude</b><small>#14294D</small></div>
+          <div class="sw"><i style="background:#4D7DB8"></i><b>Sky</b><small>#4D7DB8</small></div>
+          <div class="sw"><i style="background:#BFD3EA"></i><b>Haze</b><small>#BFD3EA</small></div>
+          <div class="sw"><i style="background:#F2C2A0"></i><b>Dawn</b><small>#F2C2A0</small></div>
+          <div class="sw"><i style="background:#F7F9FC"></i><b>Vapour</b><small>#F7F9FC</small></div>
+        </div>
+        <div class="pc">
+          <div class="pro"><h4>Strengths</h4><ul><li>Tells the product story (many → one, heavy → light) without a literal film strip.</li><li>Unmistakably sky, never storage: no cloud silhouette anywhere.</li><li>The streaks become the app's motion language: progress, drop target, completion.</li><li>Warm horizon gives a signature colour no competitor uses.</li></ul></div>
+          <div class="con"><h4>Weaknesses</h4><ul><li>Fine streaks vanish below 32 px, so it needs a simplified small-size variant (shown).</li><li>Gradient-led; must be executed precisely or it looks like a wallpaper.</li></ul></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- B -->
+    <article class="plate">
+      <div class="iconstage">
+        <svg class="big" viewBox="0 0 1024 1024" role="img" aria-label="Direction B icon"><use href="#iconB"/></svg>
+        <div class="sizes">
+          <div><svg width="64" height="64"><use href="#iconB"/></svg><span>64</span></div>
+          <div><svg width="32" height="32"><use href="#iconB"/></svg><span>32</span></div>
+          <div><svg width="16" height="16"><use href="#iconB"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="plate-body">
+        <div class="plate-head"><h3>B · Vapour frame</h3><span class="tag">Literal</span></div>
+        <p>A video frame stays solid while its weight evaporates off the right edge as wisps. Deep night-sky blue, pure white line work. The most immediately readable of the four.</p>
+        <div class="wordmark" style="background:#0B1532">
+          <svg viewBox="0 0 1024 1024"><use href="#iconB"/></svg>
+          <div><div class="wm-name" style="font:600 36px var(--display);letter-spacing:-.02em;color:#fff">Cirrus</div><div class="wm-sub" style="color:rgba(255,255,255,.7)">Video Compressor</div></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><i style="background:#0B1532"></i><b>Night</b><small>#0B1532</small></div>
+          <div class="sw"><i style="background:#26457F"></i><b>Deep</b><small>#26457F</small></div>
+          <div class="sw"><i style="background:#FFFFFF"></i><b>White</b><small>#FFFFFF</small></div>
+          <div class="sw"><i style="background:#7FA7DA"></i><b>Signal</b><small>#7FA7DA</small></div>
+        </div>
+        <div class="pc">
+          <div class="pro"><h4>Strengths</h4><ul><li>Says "video" instantly; strong at every size, 16 px included.</li><li>Simple to produce flawlessly.</li></ul></div>
+          <div class="con"><h4>Weaknesses</h4><ul><li>The play triangle inside a frame is the most common video-app icon there is.</li><li>The cirrus idea is reduced to decoration on the edge.</li><li>Dark, cold and serious; less of the lightness you described.</li></ul></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- C -->
+    <article class="plate">
+      <div class="iconstage">
+        <svg class="big" viewBox="0 0 1024 1024" role="img" aria-label="Direction C icon"><use href="#iconC"/></svg>
+        <div class="sizes">
+          <div><svg width="64" height="64"><use href="#iconC"/></svg><span>64</span></div>
+          <div><svg width="32" height="32"><use href="#iconC"/></svg><span>32</span></div>
+          <div><svg width="16" height="16"><use href="#iconC"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="plate-body">
+        <div class="plate-head"><h3>C · Ice crystal</h3><span class="tag">Technical</span></div>
+        <p>Cirrus is made of hexagonal ice crystals. Six facets form both a crystal and a camera aperture closing down: precision, optics, compression. Cool silver-blue, faceted light.</p>
+        <div class="wordmark" style="background:#EEF3F9">
+          <svg viewBox="0 0 1024 1024"><use href="#iconC"/></svg>
+          <div><div class="wm-name" style="font:300 38px 'Sora',var(--display);letter-spacing:.04em;color:#1E3A64">Cirrus</div><div class="wm-sub" style="color:#56688A">Video Compressor</div></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><i style="background:#1E3A64"></i><b>Core</b><small>#1E3A64</small></div>
+          <div class="sw"><i style="background:#6F97C6"></i><b>Facet</b><small>#6F97C6</small></div>
+          <div class="sw"><i style="background:#D7E4F3"></i><b>Frost</b><small>#D7E4F3</small></div>
+          <div class="sw"><i style="background:#F3F7FC"></i><b>Ice</b><small>#F3F7FC</small></div>
+        </div>
+        <div class="pc">
+          <div class="pro"><h4>Strengths</h4><ul><li>Clever double meaning (crystal and aperture) that rewards a second look.</li><li>Crisp geometry holds up at all sizes.</li><li>Feels like a precise professional tool.</li></ul></div>
+          <div class="con"><h4>Weaknesses</h4><ul><li>Reads as snowflake or winter before it reads as cloud.</li><li>Aperture icons are common among camera and photo apps.</li><li>Little sense of movement or lightness.</li></ul></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- D -->
+    <article class="plate">
+      <div class="iconstage">
+        <svg class="big" viewBox="0 0 1024 1024" role="img" aria-label="Direction D icon"><use href="#iconD"/></svg>
+        <div class="sizes">
+          <div><svg width="64" height="64"><use href="#iconD"/></svg><span>64</span></div>
+          <div><svg width="32" height="32"><use href="#iconD"/></svg><span>32</span></div>
+          <div><svg width="16" height="16"><use href="#iconD"/></svg><span>16</span></div>
+        </div>
+      </div>
+      <div class="plate-body">
+        <div class="plate-head"><h3>D · Mare's tail</h3><span class="tag">Editorial</span></div>
+        <p>Cirrus uncinus, the hooked "mare's tail", drawn as a single tapered ink stroke on pale sky. Paired with an italic serif wordmark. Calm, crafted, closer to a design studio than a utility.</p>
+        <div class="wordmark" style="background:#F7F9FC">
+          <svg viewBox="0 0 1024 1024"><use href="#iconD"/></svg>
+          <div><div class="wm-name" style="font:italic 400 46px var(--serif);color:#1B3156">Cirrus</div><div class="wm-sub" style="color:#56688A">Video Compressor</div></div>
+        </div>
+        <div class="swatches">
+          <div class="sw"><i style="background:#1B3156"></i><b>Ink</b><small>#1B3156</small></div>
+          <div class="sw"><i style="background:#3D6AA8"></i><b>Stroke</b><small>#3D6AA8</small></div>
+          <div class="sw"><i style="background:#D9E4F1"></i><b>Pale sky</b><small>#D9E4F1</small></div>
+          <div class="sw"><i style="background:#FAFBFD"></i><b>Paper</b><small>#FAFBFD</small></div>
+        </div>
+        <div class="pc">
+          <div class="pro"><h4>Strengths</h4><ul><li>The most elegant and least "tech".</li><li>Truest to the actual cloud form.</li></ul></div>
+          <div class="con"><h4>Weaknesses</h4><ul><li>A swoosh is easy to mistake for a generic logo mark.</li><li>Says nothing about video or compression.</li><li>Pale icon disappears on a light Dock and in Finder.</li></ul></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section>
+    <div class="stack">
+      <span class="eyebrow">Recommendation</span>
+      <h2>Convergence, executed with Vapour-frame restraint</h2>
+    </div>
+    <p>Direction A is the only one that carries the whole idea: cirrus streaks (identity), convergence (compression), a single bright point (the picture you keep). It also gives the app a motion language rather than just a logo. From B, it borrows discipline: white line work, no extra symbols, a dedicated small-size icon. The rest of this page shows A as a complete system.</p>
+  </section>
+
+  <section>
+    <div class="stack"><span class="eyebrow">System · type and colour</span><h2>Typography</h2></div>
+    <div class="grid2">
+      <div class="card typespec">
+        <div><small>Wordmark</small><span style="font:300 34px var(--display);letter-spacing:.01em">Cirrus</span></div>
+        <div><small>Marketing display</small><span style="font:300 24px var(--display);letter-spacing:-.01em">Less weight. Same picture.</span></div>
+        <div><small>App interface</small><span style="font:500 15px -apple-system,var(--body)">SF Pro, the system font. Native, Dynamic Type, no bundling.</span></div>
+        <div><small>Numbers</small><span style="font:500 15px var(--mono);font-variant-numeric:tabular-nums">412.6 MB → 38.9 MB · −90.6 %</span></div>
+      </div>
+      <div class="card">
+        <h3>Why this split</h3>
+        <p>Inside the app, SF Pro is the right choice. It's what makes a Mac app feel native, and Apple's own apps never bundle a custom UI face. The brand typeface, Hanken Grotesk Light (open-source, OFL licence), only appears in the wordmark, the About window and marketing. Its wide, light letterforms echo thin cloud. In the app, the wordmark ships as a vector image, so no font is installed. Numbers use tabular figures everywhere so sizes and percentages line up.</p>
+      </div>
+    </div>
+    <h2>Colour, light and dark</h2>
+    <div class="grid2">
+      <div class="card" style="background:#F7F9FC;color:#101826;border-color:#DDE4ED">
+        <span class="eyebrow" style="color:#66768C">Light appearance</span>
+        <div class="swatches">
+          <div class="sw"><i style="background:#F7F9FC"></i><b>Vapour</b><small style="color:#66768C">window</small></div>
+          <div class="sw"><i style="background:#EDF1F6"></i><b>Haze</b><small style="color:#66768C">sidebar</small></div>
+          <div class="sw"><i style="background:#3A6AAE"></i><b>Sky</b><small style="color:#66768C">accent</small></div>
+          <div class="sw"><i style="background:#D98E62"></i><b>Dawn</b><small style="color:#66768C">highlight</small></div>
+          <div class="sw"><i style="background:#101826"></i><b>Ink</b><small style="color:#66768C">text</small></div>
+        </div>
+      </div>
+      <div class="card" style="background:#0F1625;color:#E4EBF5;border-color:#22304A">
+        <span class="eyebrow" style="color:#8796AD">Dark appearance</span>
+        <div class="swatches">
+          <div class="sw"><i style="background:#0F1625"></i><b>Night</b><small style="color:#8796AD">window</small></div>
+          <div class="sw"><i style="background:#131C2D"></i><b>Altitude</b><small style="color:#8796AD">sidebar</small></div>
+          <div class="sw"><i style="background:#8FB6E8"></i><b>Sky</b><small style="color:#8796AD">accent</small></div>
+          <div class="sw"><i style="background:#F0B28C"></i><b>Dawn</b><small style="color:#8796AD">highlight</small></div>
+          <div class="sw"><i style="background:#E4EBF5"></i><b>Vapour</b><small style="color:#8796AD">text</small></div>
+        </div>
+      </div>
+    </div>
+    <p>Sky is the app's accent colour (buttons, selection, progress). Dawn is used sparingly, only for a moment of arrival: the convergence point, the "saved" figure on a finished result. Semantic colours (warnings, errors) stay the system's own.</p>
+  </section>
+
+  <section class="motion">
+    <div class="stack"><span class="eyebrow">System · motion</span><h2>Streaks that move with the work</h2></div>
+    <div class="grid3">
+      <div class="card">
+        <svg viewBox="0 0 400 120" preserveAspectRatio="none" aria-label="Drop target animation"><g class="drift" fill="none" stroke="#fff" stroke-linecap="round" stroke-opacity=".55">
+          <path d="M-20 30 C120 26 260 34 420 28" stroke-width="3"/><path d="M-20 52 C140 58 260 46 420 54" stroke-width="5"/>
+          <path d="M-20 76 C120 70 280 80 420 74" stroke-width="4"/><path d="M-20 96 C150 100 260 92 420 98" stroke-width="2"/></g></svg>
+        <h3>Waiting for a drop</h3><p>Streaks drift slowly behind the drop zone. On hover with a file, they brighten and lean toward the cursor.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 400 120" aria-label="Progress animation"><g class="draw" fill="none" stroke="#fff" stroke-linecap="round">
+          <path d="M10 22 C170 22 270 56 380 60" stroke-width="3" stroke-opacity=".6"/><path d="M10 42 C170 42 270 58 380 60" stroke-width="5" stroke-opacity=".8"/>
+          <path d="M10 60 C170 60 270 60 380 60" stroke-width="7"/><path d="M10 80 C170 80 270 62 380 60" stroke-width="5" stroke-opacity=".8"/>
+          <path d="M10 100 C170 100 270 64 380 60" stroke-width="3" stroke-opacity=".6"/></g></svg>
+        <h3>Compressing</h3><p>Progress is drawn as the streaks extending toward the point. Each stage (analysing, searching, encoding, verifying) is a visible segment, with ETA alongside.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 400 120" aria-label="Completion state"><g fill="none" stroke="#fff" stroke-linecap="round">
+          <path d="M10 60 L380 60" stroke-width="6"/></g><circle cx="380" cy="60" r="9" fill="#F2C2A0"/><circle cx="380" cy="60" r="24" fill="#F2C2A0" fill-opacity=".25"/></svg>
+        <h3>Done</h3><p>The streaks settle into a single line and the point warms to Dawn, next to the size saved. One quiet moment, then it's still. Everything respects Reduce Motion.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="stack"><span class="eyebrow">System · interface</span><h2>The app window</h2></div>
+    <p>Standard macOS structure (sidebar queue, detail pane, toolbar), branded through colour, the streak motif and typographic restraint rather than custom chrome. Shown with a lecture-slide video, split before/after.</p>
+    <div class="grid2">
+      <div class="win light">
+        <div class="bar"><i></i><i></i><i></i><span>Cirrus Video Compressor</span></div>
+        <div class="wbody">
+          <div class="side">
+            <div class="row sel"><div class="th"></div><div><b>Lecture 04 – Entropy.mov</b><small>2.41 GB → ~214 MB</small></div></div>
+            <div class="row"><div class="th"></div><div><b>Lecture 05 – Codes.mov</b><small>Queued</small></div></div>
+            <div class="row"><div class="th"></div><div><b>Office hours.mp4</b><small>Done · −88 %</small></div></div>
+          </div>
+          <div class="main">
+            <div class="ba"><div class="slide">Shannon entropy<small>H(X) = −Σ p(x) log₂ p(x)</small></div><div class="half"></div><span class="lbl" style="left:8px">Original</span><span class="lbl" style="right:8px">Cirrus</span></div>
+            <div class="ctl"><span class="seg"><span>Original</span><span class="on">1080p</span><span>720p</span></span><span class="seg"><span>High</span><span class="on">Balanced</span><span>Small</span></span><span>Keep text readable ✓</span></div>
+            <div class="est"><span>Estimated size<br><b>~214 MB</b></span><span>Saves<br><b>91 %</b></span><span>Time<br><b>~6 min</b></span></div>
+            <span class="btn">Compress</span>
+          </div>
+        </div>
+      </div>
+      <div class="win dark">
+        <div class="bar"><i></i><i></i><i></i><span>Cirrus Video Compressor</span></div>
+        <div class="wbody">
+          <div class="side">
+            <div class="row sel"><div class="th"></div><div><b>Lecture 04 – Entropy.mov</b><small>Encoding · 62 %</small></div></div>
+            <div class="row"><div class="th"></div><div><b>Lecture 05 – Codes.mov</b><small>Queued</small></div></div>
+            <div class="row"><div class="th"></div><div><b>Office hours.mp4</b><small>Done · −88 %</small></div></div>
+          </div>
+          <div class="main">
+            <div class="ba"><div class="slide">Shannon entropy<small>H(X) = −Σ p(x) log₂ p(x)</small></div><div class="half"></div><span class="lbl" style="left:8px">Original</span><span class="lbl" style="right:8px">Cirrus</span></div>
+            <div class="prog">
+              <svg viewBox="0 0 400 46" preserveAspectRatio="none"><g fill="none" stroke-linecap="round" stroke="var(--ribbon)">
+                <path d="M4 8 C120 8 200 22 248 23" stroke-width="2" stroke-opacity=".55"/><path d="M4 16 C120 16 200 23 248 23" stroke-width="3" stroke-opacity=".8"/>
+                <path d="M4 23 L248 23" stroke-width="4"/><path d="M4 30 C120 30 200 23 248 23" stroke-width="3" stroke-opacity=".8"/>
+                <path d="M4 38 C120 38 200 24 248 23" stroke-width="2" stroke-opacity=".55"/></g>
+                <path d="M248 23 L396 23" stroke="var(--win-line)" stroke-width="2" stroke-dasharray="2 5"/><circle cx="396" cy="23" r="4" fill="var(--win-line)"/></svg>
+              <div class="est"><span>Encoding pass 2 of 2 · 62 %</span><span>~2 min 40 s left</span></div>
+            </div>
+            <span class="btn">Cancel</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="stack"><span class="eyebrow">System · website</span><h2>Marketing aesthetic</h2></div>
+    <div class="hero">
+      <svg class="sky" viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><g class="drift" fill="none" stroke="#fff" stroke-linecap="round" stroke-opacity=".28">
+        <path d="M-40 70 C300 60 600 90 1040 74" stroke-width="2"/><path d="M-40 104 C320 112 640 92 1040 108" stroke-width="4"/>
+        <path d="M-40 140 C280 132 640 150 1040 138" stroke-width="3"/><path d="M-40 176 C340 184 620 170 1040 180" stroke-width="1.5"/></g></svg>
+      <div>
+        <span class="eyebrow" style="color:rgba(255,255,255,.7)">For macOS</span>
+        <h2>Less weight. Same picture.</h2>
+        <p>Cirrus measures your video and finds the smallest file that still looks like the original, with text you can still read.</p>
+        <div class="cta"><span>Download for Mac</span><span>See the comparisons</span></div>
+      </div>
+    </div>
+    <p>The site uses the same sky-gradient bands and streaks, real before/after crops with honest numbers (file sizes, VMAF), and plenty of empty sky. No stock photography of clouds: the motif is always drawn.</p>
+  </section>
+
+  
+</div>
