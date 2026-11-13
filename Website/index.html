@@ -657,15 +657,19 @@ const CIRRUS = { repo: "drwojakmd/cirrus-video-compressor", version: "1.1.0", as
   const num = document.getElementById('sizeNum'), bar = document.getElementById('sizeBar'), pct = document.getElementById('sizePct'), st = document.getElementById('sizeState');
   const FROM = 311355937, TO = 80121862;   // measured: 1-hour lecture recording (Benchmarks/make_long_lecture.py), default settings
   const fmt = b => b >= 1e9 ? (b / 1e9).toFixed(2) + ' GB' : b >= 1e6 ? Math.round(b / 1e6) + ' MB' : Math.round(b / 1e3) + ' KB';
-  let heroH = heroEl.offsetHeight, solid = false, ticking = false;
+  // the bar turns solid just before it would overlap the first line of the hero
+  const firstLine = heroEl.querySelector('.eyebrow');
+  const docTop = el => { let t = 0; for (; el; el = el.offsetParent) t += el.offsetTop; return t; };
+  const solidAt = () => docTop(firstLine) - nav.offsetHeight - 16;
+  let heroH = heroEl.offsetHeight, edge = solidAt(), solid = false, ticking = false;
   const last = {};
   const put = (el, key, v) => { if (last[key] !== v) { last[key] = v; if (key === 'bar') el.style.transform = v; else el.textContent = v; } };
   function update() {
     ticking = false;
     const y = scrollY;
     hero.state.conv = Math.min(1, Math.max(0, y / (heroH * 0.75)));
-    // hysteresis: the bar doesn't flicker if you stop right at the edge of the hero
-    const want = solid ? y > heroH - 130 : y > heroH - 90;
+    // hysteresis: the bar doesn't flicker if you stop right at the threshold
+    const want = solid ? y > edge - 12 : y > edge;
     if (want !== solid) { solid = want; nav.classList.toggle('solid', solid); }
     const k = ease(hero.state.conv), bytes = FROM * Math.pow(TO / FROM, k);
     put(num, 'num', fmt(bytes));
@@ -675,7 +679,7 @@ const CIRRUS = { repo: "drwojakmd/cirrus-video-compressor", version: "1.1.0", as
     hero.redraw();
   }
   addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
-  addEventListener('resize', () => { heroH = heroEl.offsetHeight; update(); });
+  addEventListener('resize', () => { heroH = heroEl.offsetHeight; edge = solidAt(); update(); });
   update();
 
   // letter dots: 50 letters, the misread ones in dawn
